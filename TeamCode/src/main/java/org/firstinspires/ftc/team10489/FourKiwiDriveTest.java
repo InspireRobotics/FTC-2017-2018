@@ -3,10 +3,9 @@ package org.firstinspires.ftc.team10489;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.internal.android.dx.rop.code.Exceptions;
 import org.firstinspires.ftc.team10489.hardware.FourKiwiRobot;
 import org.firstinspires.ftc.team10489.hardware.JewelPusher;
-import org.firstinspires.ftc.team10489.hardware.Lift;
+import org.firstinspires.ftc.team10489.hardware.GlyphSystem;
 import org.firstinspires.ftc.team10489.hardware.RevGyro;
 
 @TeleOp(name="Kiwi Drive 4 Wheel: Drive", group ="4Kiwi")
@@ -18,7 +17,7 @@ public class FourKiwiDriveTest extends LinearOpMode {
     private FourKiwiRobot robot;
     private RevGyro gyro;
     private JewelPusher jewelPusher;
-    private Lift lift;
+    private GlyphSystem lift;
     private enum Diagonal {NORTHWEST, NORTHEAST, SOUTHWEST, SOUTHEAST, NONE};
     private enum DriveMaxPower {LOW, MEDIUM, HIGH};
     private double DIAGONAL_SPEED = .5;
@@ -30,7 +29,7 @@ public class FourKiwiDriveTest extends LinearOpMode {
         gyro = new RevGyro(hardwareMap, telemetry);
         jewelPusher = new JewelPusher(hardwareMap, telemetry);
         jewelPusher.init();
-        lift = new Lift(hardwareMap, telemetry);
+        lift = new GlyphSystem(hardwareMap, telemetry);
         lift.init();
         telemetry.update();
 
@@ -41,9 +40,9 @@ public class FourKiwiDriveTest extends LinearOpMode {
             double drivePower = -gamepad1.right_stick_y;
             double sidePower = gamepad1.right_stick_x;
             double turnPower = gamepad1.left_stick_x;
-            double liftPower = -gamepad2.right_stick_y;
-            boolean liftPowerUp = gamepad2.y;
-            boolean liftPowerDown = gamepad2.a;
+            double liftPower = gamepad2.right_stick_y;
+            float grabbingPower = gamepad2.left_stick_y;
+
 
             Diagonal diagonal = getDiagonal();
 
@@ -88,21 +87,25 @@ public class FourKiwiDriveTest extends LinearOpMode {
                 robot.stop();
             }
 
-            if(liftPower > 0.2 || liftPower < -0.2){
-                lift.set(liftPower);
+            if(liftPower > 0.2 || liftPower < -0.2) {
+                lift.setLiftPower(liftPower);
+            }else{
+                lift.setLiftPower(0.0);
             }
 
-            if (liftPowerUp == true ^ liftPowerDown == true){
-                if (liftPowerUp == true){
-                    lift.set(1);
-                }else{
-                    lift.set(-1);
-                }
+            if(grabbingPower > 0.3){
+                lift.setGrabberPower(1);
+            }else if(grabbingPower < -0.3){
+                lift.setGrabberPower(-1);
+            }else{
+                lift.setGrabberPower(0);
             }
+
             gyro.update();
 
             telemetry.addLine("Running Subsystem: 4 Kiwi (Complete Test)");
             telemetry.addLine("Gyro: " + gyro.getAngle() + "   Raw: " + gyro.getCurr());
+            telemetry.addLine("Lift: " + lift.returnLiftPosition());
             telemetry.addLine("Color Sensor   Red: " + jewelPusher.getRed() + "  Blue: " + jewelPusher.getBlue());
 //            telemetry.addLine("Overall: " + gyro.getOverall());
 //            telemetry.addLine("Direction: " + gyro.direction);

@@ -11,8 +11,8 @@ import org.firstinspires.ftc.team10489.hardware.RevGyro;
 @TeleOp(name="Kiwi Drive 4 Wheel: Drive", group ="4Kiwi")
 public class FourKiwiDriveTest extends LinearOpMode {
 
-    private static final double LOW_SPEED = 0.6;
-    private static final double MEDIUM_SPEED = 0.8;
+    private static final double LOW_SPEED = 0.4;
+    private static final double MEDIUM_SPEED = 0.7;
 
     private FourKiwiRobot robot;
     private RevGyro gyro;
@@ -26,51 +26,71 @@ public class FourKiwiDriveTest extends LinearOpMode {
         telemetry.addLine("Initializing Subsystem: 4 Kiwi (Complete Test)");
         robot = new FourKiwiRobot(hardwareMap, telemetry);
         robot.init();
-        gyro = new RevGyro(hardwareMap, telemetry);
+//        gyro = new RevGyro(hardwareMap, telemetry);
         jewelPusher = new JewelPusher(hardwareMap, telemetry);
         jewelPusher.init();
         lift = new GlyphSystem(hardwareMap, telemetry);
         lift.init();
         telemetry.update();
+        DriveMaxPower driveMaxPower = DriveMaxPower.HIGH;
 
         this.waitForStart();
 
         while(this.opModeIsActive()){
-
-            double drivePower = -gamepad1.right_stick_y;
+            double drivePower = gamepad1.right_stick_y;
             double sidePower = gamepad1.right_stick_x;
             double turnPower = gamepad1.left_stick_x;
             double liftPower = gamepad2.right_stick_y;
-            float grabbingPower = gamepad2.left_stick_y;
-
+            float grabbingPower = (gamepad2.left_stick_y) / 2;
 
             Diagonal diagonal = getDiagonal();
 
-            DriveMaxPower driveMaxPower = getDriveMaxPower();
-
-            if(driveMaxPower == DriveMaxPower.LOW){
-                drivePower = LOW_SPEED;
-                turnPower = LOW_SPEED;
-                sidePower = LOW_SPEED;
-            }else if(driveMaxPower == DriveMaxPower.MEDIUM){
-                drivePower = MEDIUM_SPEED;
-                turnPower = MEDIUM_SPEED;
-                sidePower = MEDIUM_SPEED;
-            }
+            driveMaxPower = getDriveMaxPower(driveMaxPower);
 
             if(drivePower > 0.2 || drivePower < -0.2){//Drive Forward or Backward
+                if(drivePower > LOW_SPEED && driveMaxPower == DriveMaxPower.LOW){
+                    drivePower = LOW_SPEED;
+                }else if(drivePower < -LOW_SPEED && driveMaxPower == DriveMaxPower.LOW){
+                    drivePower = -LOW_SPEED;
+                }else if(drivePower > MEDIUM_SPEED && driveMaxPower == DriveMaxPower.MEDIUM){
+                    drivePower = MEDIUM_SPEED;
+                }else if(drivePower < -MEDIUM_SPEED && driveMaxPower == DriveMaxPower.MEDIUM){
+                    drivePower = -MEDIUM_SPEED;
+                }
+
+
                 if(drivePower > 0){
                     robot.set(-drivePower, drivePower, -drivePower, drivePower);
                 }else{
                     robot.set(-drivePower, drivePower, -drivePower, drivePower);
                 }
             }else if(sidePower > 0.2 || sidePower < -0.2){//Drive Left or Right
+                if(sidePower > LOW_SPEED && driveMaxPower == DriveMaxPower.LOW){
+                    sidePower = LOW_SPEED;
+                }else if(drivePower < -LOW_SPEED && driveMaxPower == DriveMaxPower.LOW){
+                    sidePower = -LOW_SPEED;
+                }else if(drivePower > MEDIUM_SPEED && driveMaxPower == DriveMaxPower.MEDIUM){
+                    sidePower = MEDIUM_SPEED;
+                }else if(drivePower < -MEDIUM_SPEED && driveMaxPower == DriveMaxPower.MEDIUM){
+                    sidePower = -MEDIUM_SPEED;
+                }
+
                if(sidePower > 0){
-                    robot.set(-sidePower, -sidePower, sidePower, sidePower);
+                    robot.set(-sidePower, -sidePower,  sidePower, sidePower);
                 }else{
                     robot.set(-sidePower, -sidePower, sidePower, sidePower);
                 }
             }else if(turnPower > 0.2 || turnPower < -0.2){
+                if(turnPower > LOW_SPEED && driveMaxPower == DriveMaxPower.LOW){
+                    turnPower = LOW_SPEED;
+                }else if(turnPower < -LOW_SPEED && driveMaxPower == DriveMaxPower.LOW){
+                    turnPower = -LOW_SPEED;
+                }else if(turnPower > MEDIUM_SPEED && driveMaxPower == DriveMaxPower.MEDIUM){
+                    turnPower = MEDIUM_SPEED;
+                }else if(turnPower < -MEDIUM_SPEED && driveMaxPower == DriveMaxPower.MEDIUM){
+                    turnPower = -MEDIUM_SPEED;
+                }
+
                 robot.set(-turnPower, -turnPower, -turnPower, -turnPower);
             }else if(diagonal != Diagonal.NONE){
                 if(diagonal == Diagonal.NORTHEAST){
@@ -93,20 +113,24 @@ public class FourKiwiDriveTest extends LinearOpMode {
                 lift.setLiftPower(0.0);
             }
 
-            if(grabbingPower > 0.3){
-                lift.setGrabberPower(1);
-            }else if(grabbingPower < -0.3){
-                lift.setGrabberPower(-1);
+            if(grabbingPower > 0.1){
+                lift.setGrabberPower(grabbingPower);
+            }else if(grabbingPower < -0.1){
+                lift.setGrabberPower(grabbingPower);
             }else{
                 lift.setGrabberPower(0);
             }
 
-            gyro.update();
+//            gyro.update();
 
-            telemetry.addLine("Running Subsystem: 4 Kiwi (Complete Test)");
-            telemetry.addLine("Gyro: " + gyro.getAngle() + "   Raw: " + gyro.getCurr());
-            telemetry.addLine("Lift: " + lift.returnLiftPosition());
+//            telemetry.addLine("Running Subsystem: 4 Kiwi (Complete Test)");
+//            telemetry.addLine("Gyro: " + gyro.getAngle() + "   Raw: " + gyro.getCurr());
+//            telemetry.addLine("Lift: " + lift.returnLiftPosition());
             telemetry.addLine("Color Sensor   Red: " + jewelPusher.getRed() + "  Blue: " + jewelPusher.getBlue());
+//            telemetry.addLine("Lift Power: " + liftPower);
+//            telemetry.addLine("Power: " + drivePower + "  " + sidePower + turnPower);
+            telemetry.addLine("Max Drive Power: " + driveMaxPower);
+            telemetry.addLine("Servo Position: " + jewelPusher.getServoPos());
 //            telemetry.addLine("Overall: " + gyro.getOverall());
 //            telemetry.addLine("Direction: " + gyro.direction);
             telemetry.update();
@@ -126,14 +150,14 @@ public class FourKiwiDriveTest extends LinearOpMode {
         return Diagonal.NONE;
     }
 
-    public DriveMaxPower getDriveMaxPower(){
+    public DriveMaxPower getDriveMaxPower(DriveMaxPower curr){
         if (gamepad1.y && !gamepad1.b && !gamepad1.a){
-            return DriveMaxPower.LOW;
+            return DriveMaxPower.HIGH;
         }else if(!gamepad1.y && gamepad1.b && !gamepad1.a){
             return DriveMaxPower.MEDIUM;
         }else if(!gamepad1.y && !gamepad1.b && gamepad1.a){
-            return DriveMaxPower.HIGH;
+            return DriveMaxPower.LOW;
         }
-        return DriveMaxPower.HIGH;
+        return curr;
     }
 }

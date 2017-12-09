@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.I2cAddr;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -14,12 +16,19 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class JewelPusher extends Subsystem {
 
     private ColorSensor colorSensor;
+    private Servo servo;
 
     public void init(){
         try{
             telemetry.addLine("Loading Jewel System");
-            colorSensor = hMap.colorSensor.get("sensor");
-        }catch(NullPointerException e){
+//            servo = hMap.servo.get("servo");
+//            colorSensor = hMap.colorSensor.get("color");
+//            colorSensor.setI2cAddress(new I2cAddr(0x3e));
+        }catch(IllegalArgumentException e){
+            telemetry.addLine("Failed to init Jewel System");
+            telemetry.addLine("Threw IllegalArgument Exception");
+        }
+        catch(NullPointerException e){
             telemetry.addLine("Failed to init Jewel system!");
         }
     }
@@ -33,6 +42,10 @@ public class JewelPusher extends Subsystem {
     }
 
     public int getAlpha() {return colorSensor.alpha();}
+
+    public double getServoPos(){
+        return servo.getPosition();
+    }
 
     public JewelPusher(HardwareMap hardwareMap, Telemetry telemetry){
         super(hardwareMap, telemetry);

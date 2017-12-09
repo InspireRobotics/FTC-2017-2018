@@ -4,14 +4,12 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 /**
  * Created by FRC4283 on 10/11/2017.
- * This is Colin's first failed attempt at programming things.
- * How long did it take you to notice this extra line, Noah?
- * This and above added on 10/10/17 4:48 p.m.
  */
 public class GlyphSystem extends Subsystem {
 
@@ -39,8 +37,12 @@ public class GlyphSystem extends Subsystem {
     }
 
     public void setGrabberPower(double grab){
+        if(grab < 0)
+            this.grabbingMotorRight.setPower(grab);
+        else
+            this.grabbingMotorRight.setPower(0);
         this.grabbingMotorLeft.setPower(grab);
-        this.grabbingMotorRight.setPower(grab);
+
     }
 
     public int returnLiftPosition(){
